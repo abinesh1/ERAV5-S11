@@ -1,0 +1,46 @@
+device=mps  width=512  budget=300 steps  stop at 200  warmup=20
+
+==========================================================================
+TUNING -- each schedule swept over the same grid at the 300-step budget
+==========================================================================
+schedule        lr   val@100   val@200   val@300
+cosine       3e-04    2.4704    2.3637    2.3304
+cosine       6e-04    2.4206    2.1908    2.1310
+cosine       1e-03    2.3458    2.0849    2.0173
+cosine       2e-03    2.2495    1.9945    1.9117
+cosine       3e-03    2.2685    2.0343    1.9430
+wsd          3e-04    2.4673    2.3031    2.1301
+wsd          6e-04    2.4220    2.1352    1.9681
+wsd          1e-03    2.3374    2.0515    1.8728
+wsd          2e-03    2.2514    2.0425    1.8689
+wsd          3e-03    2.2715    2.0701    1.9093
+
+best LR at the planned 300-step budget: cosine 2e-03, wsd 2e-03
+best LR if you had tuned for 200 instead:  cosine 2e-03, wsd 2e-03
+  cosine: same
+  wsd: same
+
+==========================================================================
+HEAD TO HEAD -- each at its own best LR, identical data order
+==========================================================================
+cosine    lr=2e-03  val@200 = 1.9956   (LR at step 200 was 5.66e-04)
+wsd       lr=2e-03  val@200 = 2.0333   (LR at step 200 was 2.00e-03)
+cosine    if allowed to finish:  val@300 = 1.9163
+wsd       if allowed to finish:  val@300 = 1.8659
+
+==========================================================================
+ANNEAL -- decay the WSD step-200 checkpoint to zero over 40 steps
+==========================================================================
+
+model                               steps  val loss
+cosine@200                            200    1.9956
+wsd@200                               200    2.0333
+wsd@200+40anneal                      240    1.9243
+cosine@240                            240    1.9450
+cosine@300                            300    1.9163
+wsd@300                               300    1.8659
+
+at the stop point:     cosine 1.9956 vs wsd 2.0333  -> cosine ahead by 0.0377
+after annealing WSD:   1.9243 vs cosine at equal compute (240) 1.9450  -> WSD ahead by 0.0207
+
+wrote figures/part4_schedules.png, results/exp3_schedules.json

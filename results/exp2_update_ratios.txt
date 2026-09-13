@@ -1,0 +1,37 @@
+device=mps  width=512  steps=300  warmup=50  lr=0.001
+params: 12.7M
+
+parameter                                     @warmup end    plateau  lr/RMS(w)  RMS(dw)/lr  settles
+tok.weight                                       2.81e-04   2.34e-04   1.02e-03       0.229       50
+pos.weight                                       2.49e-04   2.55e-04   1.03e-03       0.248       50
+blocks.layers.0.linear1.weight                   7.28e-03   7.08e-03   3.51e-02       0.202       50
+blocks.layers.0.linear2.weight                   1.07e-02   1.14e-02   5.84e-02       0.196       50
+blocks.layers.1.self_attn.in_proj_weight         5.87e-03   6.31e-03   2.94e-02       0.215       50
+blocks.layers.1.linear2.weight                   1.00e-02   1.13e-02   5.56e-02       0.202       50
+blocks.layers.2.self_attn.in_proj_weight         5.45e-03   6.20e-03   3.01e-02       0.206       50
+head.weight                                      7.05e-03   6.05e-03   3.04e-02       0.199       50
+blocks.layers.1.linear1.weight                   6.31e-03   7.22e-03   3.39e-02       0.213       63
+blocks.layers.1.self_attn.out_proj.weight        4.61e-03   7.38e-03   3.49e-02       0.212       79
+blocks.layers.2.linear2.weight                   9.38e-03   1.12e-02   5.56e-02       0.201       87
+blocks.layers.3.self_attn.in_proj_weight         4.96e-03   6.19e-03   3.02e-02       0.205       88
+blocks.layers.3.linear2.weight                   8.64e-03   1.11e-02   5.72e-02       0.195       99
+blocks.layers.2.self_attn.out_proj.weight        4.15e-03   7.47e-03   3.60e-02       0.207      101
+blocks.layers.2.linear1.weight                   5.57e-03   7.28e-03   3.39e-02       0.215      103
+blocks.layers.3.linear1.weight                   5.04e-03   7.17e-03   3.43e-02       0.209      112
+blocks.layers.3.self_attn.out_proj.weight        3.71e-03   7.15e-03   3.66e-02       0.195      113
+blocks.layers.0.self_attn.in_proj_weight         7.13e-03   6.01e-03   2.82e-02       0.213      131
+blocks.layers.0.self_attn.out_proj.weight        5.72e-03   6.88e-03   3.45e-02       0.199      143
+
+LR stops changing at step 50 (warmup ends -- by construction).
+Measured: ratios stay within 20% of their plateau from step 79 (median across 19 tensors), spread 50-143.
+
+Plateau ratios span 2.3e-04 to 1.1e-02 -- a 49x spread across tensors, none near the quoted 1e-03.
+But RMS(update)/lr averages 0.208 and spans only 0.195-0.248 -- flat across every tensor.
+So the ratio factorises: RMS(dw)/RMS(w) = (0.21 * lr) / RMS(w). The optimizer sets the
+numerator (an Adam step is bounded by lr; gradient noise damps it to ~0.21 lr here) and
+the entire 49x spread is the denominator -- i.e. initialization scale. nn.Embedding inits
+N(0,1) (RMS ~0.98); nn.Linear inits U(+/-1/sqrt(fan_in)) (RMS ~0.028).
+Reading this as 'the embeddings are barely learning' would be wrong -- they take the same
+size step as everything else. This is the asymmetry muP fixes by scaling LRs per tensor.
+
+wrote figures/part3_update_ratios.png, results/exp2_update_ratios.json

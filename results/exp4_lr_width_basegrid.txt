@@ -1,0 +1,39 @@
+device=mps  widths=[256, 512, 1024]  grid=['1e-04', '2e-04', '4e-04', '8e-04', '2e-03', '3e-03', '6e-03']  300 steps
+
+width   256  lr  1.0e-04  val   2.5484
+width   256  lr  2.0e-04  val   2.4843
+width   256  lr  4.0e-04  val   2.4196
+width   256  lr  8.0e-04  val   2.2911
+width   256  lr  1.6e-03  val   2.0989
+width   256  lr  3.2e-03  val   2.0003
+width   256  lr  6.4e-03  val   1.9697
+  -> width 256: grid argmin 6.4e-03, parabola vertex 6.40e-03, best val 1.9697   [AT GRID EDGE -- widen the grid]
+
+width   512  lr  1.0e-04  val   2.4655
+width   512  lr  2.0e-04  val   2.3987
+width   512  lr  4.0e-04  val   2.2556
+width   512  lr  8.0e-04  val   2.0646
+width   512  lr  1.6e-03  val   1.9368
+width   512  lr  3.2e-03  val   1.9356
+width   512  lr  6.4e-03  val   2.4391
+  -> width 512: grid argmin 3.2e-03, parabola vertex 2.27e-03, best val 1.9356
+
+width  1024  lr  1.0e-04  val   2.3830
+width  1024  lr  2.0e-04  val   2.2023
+width  1024  lr  4.0e-04  val   1.9984
+width  1024  lr  8.0e-04  val   1.8804
+width  1024  lr  1.6e-03  val   1.8957
+width  1024  lr  3.2e-03  val   2.4388
+width  1024  lr  6.4e-03  val   2.4946
+  -> width 1024: grid argmin 8.0e-04, parabola vertex 1.04e-03, best val 1.8804
+
+========================================================================
+optimal LR vs width:  log2(lr*) = -1.307 * log2(width) + 3.108
+slope -1.307  ->  lr* scales as width^-1.31   (R^2 = 0.9930, 3 points, 1 dof)
+  theory: standard parameterization predicts ~width^-1; muP would predict ~width^0
+
+prediction at width 4096:  lr* = 1.63e-04
+nudging each measured minimum by +/- half a grid step moves the prediction to [5.14e-05, 5.18e-04]  (10.1x span)
+that span is one two-octave extrapolation from 3 points -- see README for the call.
+
+wrote figures/part5_lr_vs_width.png, results/exp4_lr_width.json
