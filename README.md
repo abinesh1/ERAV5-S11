@@ -8,10 +8,13 @@ optimum goes as the model gets wider.
 Everything here is reproduced by `./run_all.sh`. Parts 1–2 are CPU and take seconds.
 Parts 3–5 train a 4-layer character transformer on TinyShakespeare and took about
 2h20m end to end on an Apple M1 (MPS) — roughly 3 min, 45 min and 95 min respectively.
-
+Í
 ---
 
-## The five answers, up front
+## Note
+Claude did most of the part here. While my input is low here, i've read through the entire readme here and understood what the assignment needed. 
+
+## The five answers
 
 | # | Question | Answer |
 |---|---|---|
